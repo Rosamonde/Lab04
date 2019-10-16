@@ -61,7 +61,7 @@ Your goal is to understand the data well enough that you can identify two featur
 
 ```{r}
 ggpairs(glass)
-```
+``` 
 
 I will use Na and Al.
 
