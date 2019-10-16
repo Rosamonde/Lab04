@@ -131,22 +131,30 @@ train_val_mse <- data.frame(
 )
 
 #split the dataset into trainning set and validation set
-  for (i in seq_len(num_crossval_folds)){
-    glass_train <- train_glass %>% slice(-crossval_val_fold_inds[[i]])
-    glass_val <- train_glass %>% slice(crossval_val_fold_inds[[i]])
-  }
+for (i in seq_len(num_crossval_folds)){
+  Cross_glass_train <- train_glass %>% slice(-crossval_val_fold_inds[[i]])
+  Cross_glass_val <- train_glass %>% slice(crossval_val_fold_inds[[i]])
+}
     
 #train the model     
-    knn_fit_scaled_by_caret <- train(
-      form = type ~ Al + Na, 
-      data = train_glass,
-      use.all=FALSE,
-      method = "knn",
-      preProcess = "scale",
-      trControl = trainControl(method = "none"),
-      tuneGrid = data.frame(k=5))
+knn_fit_scaled_by_caret <- train(
+  form = type ~ Al + Na, 
+  data = Cross_glass_train,
+  method = "knn",
+  preProcess = "scale",
+  trControl = trainControl(method = "none"),
+  tuneGrid = data.frame(k=5))
     
-#generate the prediction for the validation set data  
+#generate the prediction for the validation set data
+y_hats <- predict(knn_fit_scaled_by_caret, newdata = Cross_glass_val, type = "raw")
+head(y_hats)
+#[1] WinF WinF WinF WinF WinF WinF
+##Levels: Con Head Tabl Veh WinF WinNF
+
+#the proportion of predicted parties are not equal to the observed party 
+mean(y_hats != Cross_glass_val$type)
+##[1] 0.4375
+    
  
 ```
 ```
